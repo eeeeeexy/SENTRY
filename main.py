@@ -12,7 +12,6 @@ import models.utils as utils
 import models.Models_Sequence
 import models.Models_Image
 import models.Models_Fusion
-import models.Pertubation
 import models.SupCon_models
 from models.logger import CompleteLogger
 from models.utils import AverageMeter
@@ -241,9 +240,6 @@ def attack(clean_traj, seq_model, labels):
 
 
 def attack_activate_gaussian_noise(tensor, std=0.01):
-    """
-    仅在有数值的像素点（轨迹路径）上加噪声
-    """
     noise = torch.randn_like(tensor) * std
     # 创建一个 mask，只在原图非零的地方应用噪声
     mask = (tensor > 0).float()
@@ -252,17 +248,13 @@ def attack_activate_gaussian_noise(tensor, std=0.01):
 
 
 class SupConLoss(nn.Module):
-    """Supervised Contrastive Learning Loss"""
+
     def __init__(self, temperature=0.07):
         super(SupConLoss_v1, self).__init__()
         self.temperature = temperature
 
     def forward(self, features, labels):
-        """
-        Args:
-            features: [batch_size, 2, dim] 
-            labels: [batch_size]
-        """
+
         device = features.device
         batch_size = features.shape[0]
 
@@ -301,12 +293,9 @@ class SupConLoss(nn.Module):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Attack on CNN_SECA model')
 
-    parser.add_argument("--backbone", type=str, default='Estimator', choices=['SECA', 'Estimator', 'GPS-Pixel-Align', 'Traj2Former'],
+    parser.add_argument("--backbone", type=str, default='Estimator', choices=['SECA', 'Estimator'],
                         help="Backbones.")
-    parser.add_argument("--loss_function", type=str, default='None', choices=['KL+SupCon+Alignment-v1'],
-                        help="Loss function.")
 
-    
     parser.add_argument('--contrastive_loss', action='store_true',
                         help='Normalize lat and lon values.')
     parser.add_argument('--contrasloss_alpha', type=float, default=0.0,
