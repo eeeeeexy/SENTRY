@@ -19,7 +19,6 @@ class GPS_Pixel_Align(nn.Module):
 
     def forward(self, clean_traj=None, adv_traj=None, clean_map19=None, adv_map19=None, pixel_index=None, compressed_size=None, args=None):
 
-        # 场景 B: 测试模式 (只传其中一个)
         target_traj = clean_traj if clean_traj is not None else adv_traj
         target_img = clean_map19 if clean_map19 is not None else adv_map19
 
