@@ -96,7 +96,6 @@ def train(train_loader, seq_model, defense_model, optimizer_merge, args):
         criterion_supcon = SupConLoss(temperature=0.1)
         features = torch.stack([clean_fusion_emb, adv_fusion_emb], dim=0)
         loss_con = criterion_supcon(features, labels)
-        # loss_supcon = F.cross_entropy(clean_outputs, labels) + 0.5 * loss_con
         loss_supcon = loss_normal + loss_con
 
         # KL loss
