@@ -107,7 +107,6 @@ def load_data_Seq_Img(args):
         all_lons = []
 
         for sample in train_init_traj+test_init_traj:
-            # sample[0] 是形状为 (600, 7) 的轨迹数据
             data_np = np.array(sample[0]) 
             all_lats.append(np.abs(data_np[:, 5]).max())
             all_lons.append(np.abs(data_np[:, 6]).max())
