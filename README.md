@@ -30,17 +30,6 @@ Install the required packages:
 
 pip install torch numpy tqdm torchmetrics
 
-## Data Preparation
-
-The data loader expects preprocessed pickle files for trajectory samples, map images, auxiliary map channels, and trajectory-to-map pixel indices.
-
-In `models/utils.py`, replace the placeholder paths:
-
-traj_init_filename = "xxx.pickle"
-map_filename = "xxx.pickle"
-map_channel6_filename = "xxx.pickle"
-traj_init_filename_geo = "xxx.pickle"
-
 ## Training
 
 Run SENTRY with:
