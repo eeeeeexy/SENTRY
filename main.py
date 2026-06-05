@@ -141,7 +141,6 @@ def train(train_loader, seq_model, defense_model, optimizer_merge, args):
             if (label == p_clean):
                 n_class_correct_clean[label] += 1
             
-            # Adv 类统计
             if (label == p_adv):
                 n_class_correct_adv[label] += 1
 
@@ -174,7 +173,6 @@ def test(test_loader, seq_model, defense_model, test_mode, do_plot, args=None):
     for (clean_traj, map_img_sample, map_extra_sample, labels, index) in tqdm(test_loader):
 
         clean_traj = clean_traj.to(device)
-        # adv_traj = adv_traj.to(device)
 
         map_img_sample = map_img_sample.to(device)
         map_extra_sample = map_extra_sample.to(device)
@@ -221,15 +219,12 @@ def test(test_loader, seq_model, defense_model, test_mode, do_plot, args=None):
 
 
 def attack(clean_traj, seq_model, labels):
-    # Attack in the batch
     features = clean_traj[:, :, 1:]
-    # generate mask（same shape as pert），1 presents it could be attacked
     mask = torch.zeros_like(features)
 
     _, seq_len, feat_dim = features.shape
-    num_attack_points = int(seq_len * args.mask_rate)  # random choose mask rate
+    num_attack_points = int(seq_len * args.mask_rate) 
 
-    # choose the random attack points
     attack_indices = random.sample(range(seq_len), num_attack_points)
     mask[:, attack_indices, :] = 1.0
 
@@ -240,7 +235,6 @@ def attack(clean_traj, seq_model, labels):
 
 def attack_activate_gaussian_noise(tensor, std=0.01):
     noise = torch.randn_like(tensor) * std
-    # 创建一个 mask，只在原图非零的地方应用噪声
     mask = (tensor > 0).float()
     noisy_tensor = tensor + (noise * mask)
     return torch.clamp(noisy_tensor, 0., 1.)
