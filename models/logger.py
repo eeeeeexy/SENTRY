@@ -58,21 +58,11 @@ class CompleteLogger:
             return self.phase
 
     def get_image_path(self, filename: str):
-        """
-        Get the full image path for a specific filename
-        """
+
         return os.path.join(self.visualize_directory, self._get_phase_or_epoch(), filename)
 
     def get_checkpoint_path(self, name=None):
-        """
-        Get the full checkpoint path.
 
-        Args:
-            name (optional): the filename (without file extension) to save checkpoint.
-                If None, when the phase is ``train``, checkpoint will be saved to ``{epoch}.pth``.
-                Otherwise, will be saved to ``{phase}.pth``.
-
-        """
         if name is None:
             name = self._get_phase_or_epoch()
         name = str(name)

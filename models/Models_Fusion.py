@@ -39,10 +39,8 @@ class Align_Model(nn.Module):
 
         scores = self.get_attention_scores(seq_traj)
 
-        # 选出注意力分数最高的 k 个位置
         _, topk_indices = torch.topk(scores, k=k, dim=1)
 
-        # 按时间顺序排列选中的轨迹点
         topk_indices, _ = torch.sort(topk_indices, dim=1)
 
         row_idx = torch.arange(

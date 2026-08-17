@@ -57,7 +57,6 @@ def main(args: argparse.Namespace):
         acc_clean, acc_adv, epoch_loss = train(train_loader, seca_model, defense_model, optimizer_merge, args)
         print(f'epoch {epoch+1} / {args.epochs}, loss = {epoch_loss}, acc clean = {acc_clean:.4f}, acc adv = {acc_adv:.4f}')
 
-        # 如果用 CUDA，需要 synchronize，确保 GPU kernel 真正跑完
         if torch.cuda.is_available():
             torch.cuda.synchronize()
 
@@ -237,12 +236,6 @@ def train(train_loader, seq_model, defense_model, optimizer_merge, args):
                 clean_traj, clean_map19, defense_model, labels, args, pixel_index=index
             )
 
-
-        if args.backbone == 'SECA':
-            # outputs = defense_model(clean_traj=clean_traj, adv_traj=adv_traj)
-            clean_fusion_emb, clean_outputs = defense_model(clean_traj=clean_traj, adv_traj=None)
-            adv_fusion_emb, adv_outputs = defense_model(clean_traj=None, adv_traj=adv_traj)
-
         if args.backbone == 'Estimator':
             # clean_emb, adv_emb, clean_output, outputs = defense_model(clean_traj=clean_traj, adv_traj=adv_traj, clean_map19=clean_map19, adv_map19=adv_map19)
             clean_seq_emb, clean_img_emb, clean_fusion_emb, clean_outputs = defense_model(clean_traj=clean_traj, adv_traj=None, clean_map19=clean_map19, adv_map19=None, args=args)
@@ -293,7 +286,7 @@ def train(train_loader, seq_model, defense_model, optimizer_merge, args):
             # ===== global alignment data loss =====
             loss_global_align = F.mse_loss(clean_outputs, adv_outputs)
 
-            # 总损失 (AD+DCL+CMEA+SCI)
+            # (AD+DCL+CMEA+SCI)
             # ===== final loss =====
             loss = (
                 args.lambda_sentry_clean_ce * loss_clean_ce +
@@ -328,7 +321,6 @@ def train(train_loader, seq_model, defense_model, optimizer_merge, args):
             if (label == p_clean):
                 n_class_correct_clean[label] += 1
             
-            # Adv 类统计
             if (label == p_adv):
                 n_class_correct_adv[label] += 1
 
@@ -390,9 +382,6 @@ def test(test_loader, seq_model, defense_model, test_mode, do_plot, args=None):
         
         if test_mode == 'clean':
 
-            if args.backbone == 'SECA':
-                _, outputs = defense_model(clean_traj=clean_traj, adv_traj=None)
-
             if args.backbone == 'Estimator':
                 clean_seq_emb, clean_img_emb, clean_fusion_emb, outputs = defense_model(clean_traj=clean_traj, adv_traj=None, clean_map19=clean_map19, adv_map19=None, args=args)
 
@@ -435,8 +424,6 @@ def test(test_loader, seq_model, defense_model, test_mode, do_plot, args=None):
         acc = 100.0 * n_class_correct[i] / n_class_samples[i]
         print(f'Accuracy of {classes[i]}: {acc:.4f} %')
         acc_list.append(acc)
-    # with open('result.txt', 'a') as f:
-    #     f.write(f"{acc_list}\n{acc_val:.4f}\n-----------------------------------")
     print(f'test acc on {test_mode} = {acc_val:.4f} %')
     print(f'ave test acc on {test_mode}: {(np.array(acc_list).sum() / args.num_classes):.4f} %')
 

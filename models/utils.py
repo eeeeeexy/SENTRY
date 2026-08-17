@@ -230,23 +230,3 @@ class Dataset_init600_map19_index_class(Dataset):
         traj_index_lists = torch.tensor(np.array(new_traj_index))
 
         return init_traj_sample, traj_map13, traj_map6, crop_map13, crop_map6, traj_index_lists, class_list, label, index
-
-
-    # 1. 执行 t-SNE 降维
-    # perplexity: 建议取值 5-50，代表局部邻居的数量
-    tsne = TSNE(n_components=2, perplexity=30, init='pca', max_iter=1000, random_state=42)
-    data_2d = tsne.fit_transform(data)
-    
-    # 2. 绘图
-    plt.figure(figsize=(10, 8))
-    # 假设标签是 0 和 1（健康 vs 病人）
-    scatter = plt.scatter(data_2d[:, 0], data_2d[:, 1], 
-                          c=labels, 
-                          cmap='Set1',    # 颜色更鲜艳、对比更强
-                          alpha=0.9,      # 不再透明，颜色更实
-                          edgecolors='none') # 去掉白色边框，让颜色更饱满
-    plt.colorbar(scatter)
-    plt.title(title)
-    plt.grid(True, alpha=0.3)
-
-    plt.savefig(path_name, dpi=300, bbox_inches='tight')
