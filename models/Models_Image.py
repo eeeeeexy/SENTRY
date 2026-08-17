@@ -29,6 +29,7 @@ class CNN_map19_wo_softmax(nn.Module):
         self.relu = nn.ReLU()
 
         self.fcnn = nn.Linear(1600, 128)
+        # self.fcnn = nn.Linear(1600, 16)
 
 
     def forward(self, map19):

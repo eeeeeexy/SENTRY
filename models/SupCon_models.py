@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+
 class GPS_Pixel_Align(nn.Module):
     def __init__(self, SECA_model, Img_model, Align_model, num_class, *args) -> None:
         super().__init__()
@@ -28,11 +29,11 @@ class GPS_Pixel_Align(nn.Module):
         x_final = self.fc_merge(x_emb)
 
         reconstruction_seq, reconstruction_img = self.align_model(target_traj, target_img, pixel_index, compressed_size)
+
         x_re_traj = self.traj_model(reconstruction_seq)
         x_re_img = self.img_model(reconstruction_img)
         x_re_emb = torch.cat((x_re_traj, x_re_img), dim=1)
         x_re_final = self.fc_merge(x_re_emb)
 
         return x_traj, x_img, x_emb, x_final, x_re_final
-
 

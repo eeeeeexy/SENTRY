@@ -1,6 +1,5 @@
 import torch.nn as nn
 import torch.nn.functional as F
-import torch
 
 class SamePadConv(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, dilation=1, groups=1):
@@ -53,32 +52,6 @@ class DilatedConvEncoder(nn.Module):
         return self.net(x)
 
 
-class SECA(nn.Module):
-    def __init__(self, input_dims, output_dims, depth, hidden_dims=64):
-        super().__init__()
-        self.input_dims = input_dims
-        self.output_dims = output_dims
-        self.hidden_dims = hidden_dims
-
-        self.input_fc = nn.Linear(input_dims, hidden_dims)
-        self.feature_extractor = DilatedConvEncoder(hidden_dims, [hidden_dims] * depth + [output_dims], kernel_size=3)
-        self.final_fc = nn.Linear(128, 6)
-
-    def forward(self, x):
-        x = x.float()
-        x = self.input_fc(x)  # B x T x Ch
-        # conv encoder
-        x = x.transpose(1, 2)  # B x Ch x T
-        # x = self.repr_dropout(self.feature_extractor(x))  # B x Co x T
-        x = self.feature_extractor(x)  # B x Co x T
-        x = x.transpose(1, 2)  # B x T x Co
-
-        x_emb = F.avg_pool1d(x.transpose(1, 2), kernel_size=x.size(1)).transpose(1, 2).squeeze(1)
-        x_final = self.final_fc(x_emb)
-
-        return x_emb, x_final
-
-
 class SECA_wo_softmax(nn.Module):
     def __init__(self, input_dims, output_dims, depth, hidden_dims=64):
         super().__init__()
@@ -96,8 +69,9 @@ class SECA_wo_softmax(nn.Module):
         x = x.transpose(1, 2)  # B x Ch x T
         # x = self.repr_dropout(self.feature_extractor(x))  # B x Co x T
         x = self.feature_extractor(x)  # B x Co x T
-        x = x.transpose(1, 2)  # B x T x Co
+        x_emb = x.transpose(1, 2)  # B x T x Co
 
-        x = F.avg_pool1d(x.transpose(1, 2), kernel_size=x.size(1)).transpose(1, 2).squeeze(1)
+        x = F.avg_pool1d(x_emb.transpose(1, 2), kernel_size=x_emb.size(1)).transpose(1, 2).squeeze(1)
 
         return x
+
