@@ -34,7 +34,7 @@ pip install torch numpy tqdm torchmetrics
 
 Run SENTRY with:
 
-python ./main.py --Normalize_latlon --seq-attack-time 5 --map_attack_std 0.3 --backbone Estimator
+python ./main.py --Normalize_latlon --joint_pgd_steps 20 --backbone Estimator
 
 ## Notes
 
